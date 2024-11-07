@@ -1,5 +1,6 @@
 ---
 title: "Pseudocode: Craps Simulation"
+output: html_document
 ---
 
 # Instructor Comments
@@ -205,6 +206,25 @@ simulate_craps_game <- function() {
 
 ```
 
+```{r}
+run_craps_simulation <- function(N) {
+  # Input: N, the number of games to simulate
+  # Output: A data frame with summary information for each game
+  # Description: Runs N games of craps, generating a summary for each game
+  
+  simulations <- data.frame()
+  
+  for (i in 1:N) {
+    game_data <- simulate_craps_game()
+    game_summary <- summarize_craps_game(game_data)
+    simulations <- rbind(simulations, game_summary)
+  }
+  
+  return(simulations)
+}
+
+```
+
 
 
 **Requirement 2:**    
@@ -214,10 +234,40 @@ You must include a summary function named `summarize_craps_game` that takes the 
 - `outcome`, whether the game was won or lost
 - `point`, the total of the dice on the first roll, if the game continued past the first roll, and NA otherwise.
 
+```{r}
+summarize_craps_game <- function(game_data) {
+  # Input: A data frame from simulate_craps_game
+  # Output: A single-row data frame summarizing the game
+  # Description: Computes summary statistics for a single game, including total rolls, final outcome, and point
+  
+  n_rolls <- nrow(game_data)
+  outcome <- game_data$outcome[n_rolls]  # Outcome of the last roll
+  point <- ifelse(game_data$outcome[1] == "continue", game_data$roll[1], NA)
+  
+  summary <- data.frame(
+    n_rolls = n_rolls,
+    outcome = outcome,
+    point = point
+  )
+  
+  return(summary)
+}
+
+```
+
+
 **Requirement 3:**    
 You must include a function to run your simulation, `run_craps_simulation(N)` that takes a single integer argument `N` which determines the number of games which will be played. 
 
 Think carefully about how you want to structure your code - do you want to return the full results for each game and then summarize, or do you want to summarize before you return the full results?
+
+```{r}
+# Run the simulation for 5 games and print the summary results- I like this b/c I can change the number of games
+simulation_results <- run_craps_simulation(5)
+print(simulation_results)
+
+```
+
 
 
 ## Planning Helper Functions {#sec-helper}
@@ -237,13 +287,75 @@ roll_dice <- function() {
 
 Put each function in a separate code block.
 
+```{r}
+is_come_out_win <- function(roll) {
+  # Input: roll, an integer representing the sum of two dice
+  # Output: TRUE if the roll is 7 or 11, FALSE otherwise
+  # Description: Checks if the come-out roll results in an immediate win
+  return(roll == 7 || roll == 11)
+}
+```
+```{r}
+is_come_out_loss <- function(roll) {
+  # Input: roll, an integer representing the sum of two dice
+  # Output: TRUE if the roll is 2, 3, or 12, FALSE otherwise
+  # Description: Checks if the come-out roll results in an immediate loss
+  return(roll == 2 || roll == 3 || roll == 12)
+}
+```
+
+```{r}
+play_point_phase <- function(point) {
+  # Input: point, an integer representing the established point
+  # Output: a list with 'outcome' (win or loss) and 'n_rolls' (number of rolls in this phase)
+  # Description: Continues rolling until either the point or a 7 is rolled
+  n_rolls <- 0
+  repeat {
+    roll <- roll_dice()
+    n_rolls <- n_rolls + 1
+    if (roll == point) {
+      return(list(outcome = "win", n_rolls = n_rolls))
+    } else if (roll == 7) {
+      return(list(outcome = "loss", n_rolls = n_rolls))
+    }
+  }
+}
+```
+
+```{r}
+simulate_single_roll <- function(id) {
+  # Input: id, an integer indicating the roll number in the game
+  # Output: a data frame with the roll's ID, total roll, and initial outcome (win, loss, or continue)
+  # Description: Simulates a single roll and returns its result in a standardized format
+  roll <- roll_dice()
+  if (is_come_out_win(roll)) {
+    return(data.frame(id = id, roll = roll, outcome = "win"))
+  } else if (is_come_out_loss(roll)) {
+    return(data.frame(id = id, roll = roll, outcome = "loss"))
+  } else {
+    return(data.frame(id = id, roll = roll, outcome = "continue"))
+  }
+}
+
+```
+
+```{r}
+play_again <- function() {
+  # Input: None
+  # Output: TRUE if the player wants to play again, FALSE otherwise
+  # Description: Asks the player if they want to continue playing
+  response <- readline(prompt = "Do you want to play again? (yes/no): ")
+  return(tolower(response) == "yes")
+}
+```
+
 ## Planning Main Functions {#sec-main-function-diagram}
 
 Update your flowchart from @sec-flowchart to match the requirements of this section. 
 Your flowchart should have separate blocks for each function. 
 Which helper function(s) will be called inside each required function?
 
-<!-- Include a picture here using markdown image format. Save the picture in your repository and remember to commit it! -->
+![view updated craps flowcart](updated Craps.png)
 
 ## Simulating a full game {#sec-game-pseudocode}
 
