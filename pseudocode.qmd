@@ -98,7 +98,7 @@ function playAgain():
 Create a flowchart illustrating how the game unfolds, using the function names provided in the ChatGPT code. 
 Include this as a PNG file in the repository and link to it here.
 
-![Flowchart of Craps](Copy of Roll 2 dice.png)
+![Flowchart of Craps](Copy of Roll 2 dice (1).png)
 
 
 ## Single game data structure {#sec-single-game-data}
@@ -355,7 +355,7 @@ Update your flowchart from @sec-flowchart to match the requirements of this sect
 Your flowchart should have separate blocks for each function. 
 Which helper function(s) will be called inside each required function?
 
-![view updated craps flowcart](updated Craps.png)
+#![view updated craps flowcart]
 
 ## Simulating a full game {#sec-game-pseudocode}
 
