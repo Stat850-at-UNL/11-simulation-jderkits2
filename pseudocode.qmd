@@ -98,7 +98,7 @@ function playAgain():
 Create a flowchart illustrating how the game unfolds, using the function names provided in the ChatGPT code. 
 Include this as a PNG file in the repository and link to it here.
 
-![Flowchart of Craps](Copy of Roll 2 dice (1).png)
+![flowchart of Craps](Copy of Roll 2 dice (1).png)
 
 
 ## Single game data structure {#sec-single-game-data}
@@ -262,10 +262,20 @@ You must include a function to run your simulation, `run_craps_simulation(N)` th
 Think carefully about how you want to structure your code - do you want to return the full results for each game and then summarize, or do you want to summarize before you return the full results?
 
 ```{r}
-# Run the simulation for 5 games and print the summary results- I like this b/c I can change the number of games
-simulation_results <- run_craps_simulation(5)
-print(simulation_results)
-
+run_craps_simulation <- function(N) {
+  # Create an empty list to store summaries
+  simulation_list <- vector("list", N)
+  
+  for (i in 1:N) {
+    game_data <- simulate_craps_game()          # Run a single game
+    game_summary <- summarize_craps_game(game_data) # Summarize it
+    simulation_list[[i]] <- game_summary        # Store only the summary
+  }
+  
+  # Combine all summaries into a data frame
+  simulations <- bind_rows(simulation_list)
+  return(simulations)  # Returns only summaries
+}
 ```
 
 
@@ -355,7 +365,7 @@ Update your flowchart from @sec-flowchart to match the requirements of this sect
 Your flowchart should have separate blocks for each function. 
 Which helper function(s) will be called inside each required function?
 
-#![view updated craps flowcart]
+![updated craps flowcart](updated Craps(1).png)
 
 ## Simulating a full game {#sec-game-pseudocode}
 
@@ -556,6 +566,9 @@ run_craps_simulation <- function(N) {
 ## Planning for implementation
 
 What parts are still missing for you to write code implementing craps based on your pseudocode? 
+  I need this: craps_game_overall_summary <- function() and I still need to possibly add code for summary statistics
 What do you expect you will need to do before/during the coding process?
+  Try different parts of the code to see what and how they are working, including debugging
 Make a plan for next week's work. Where will you start?
+  Look at the code and print it all out, then see what all the next steps are needed after feedback
 
