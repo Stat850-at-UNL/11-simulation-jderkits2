@@ -98,7 +98,7 @@ function playAgain():
 Create a flowchart illustrating how the game unfolds, using the function names provided in the ChatGPT code. 
 Include this as a PNG file in the repository and link to it here.
 
-![flowchart of Craps](Copy of Roll 2 dice (1).png)
+![flowchart of Craps](Copy of Roll 2 dice(2).png)
 
 
 ## Single game data structure {#sec-single-game-data}
