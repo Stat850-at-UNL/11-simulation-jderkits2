@@ -17,9 +17,6 @@ Make sure this document compiles before you submit your answers.
 ## `roll_dice`
 
 ```{r}
- # Input: None
-  # Output: an integer from 2 to 12
-  # Description: Generates two random numbers from 1 to 6, sums them, and returns the result
 roll_dice <- function() {
   die1 <- sample(1:6, 1)
   die2 <- sample(1:6, 1)
@@ -31,9 +28,6 @@ roll_dice <- function() {
 ## 'is_come_out_win'
 ```{r}
 is_come_out_win <- function(roll) {
-  # Input: roll, an integer representing the sum of two dice
-  # Output: TRUE if the roll is 7 or 11, FALSE otherwise
-  # Description: Checks if the come-out roll results in an immediate win
   return(roll == 7 || roll == 11)
 }
 ```
@@ -41,9 +35,6 @@ is_come_out_win <- function(roll) {
 ## 'is_come_out_loss'
 ```{r}
 is_come_out_loss <- function(roll) {
-  # Input: roll, an integer representing the sum of two dice
-  # Output: TRUE if the roll is 2, 3, or 12, FALSE otherwise
-  # Description: Checks if the come-out roll results in an immediate loss
   return(roll == 2 || roll == 3 || roll == 12)
 }
 ```
@@ -51,16 +42,13 @@ is_come_out_loss <- function(roll) {
 ## 'play_point_phase'
 ```{r}
 play_point_phase <- function(point) {
-  # Input: point, an integer representing the established point
-  # Output: a list with 'outcome' (win or loss) and 'n_rolls' (number of rolls in this phase)
-  # Description: Continues rolling until either the point or a 7 is rolled
   n_rolls <- 0
   repeat {
     roll <- roll_dice()
     n_rolls <- n_rolls + 1
-    if (roll == point) {
+    if (roll$Total == point) {
       return(list(outcome = "win", n_rolls = n_rolls))
-    } else if (roll == 7) {
+    } else if (roll$Total == 7) {
       return(list(outcome = "loss", n_rolls = n_rolls))
     }
   }
@@ -68,15 +56,15 @@ play_point_phase <- function(point) {
 ```
 
 ## 'play_again'
-```{r}
-play_again <- function() {
+#``{r}
+#lay_again <- function() {
   # Input: None
   # Output: TRUE if the player wants to play again, FALSE otherwise
   # Description: Asks the player if they want to continue playing
-  response <- readline(prompt = "Do you want to play again? (yes/no): ")
-  return(tolower(response) == "yes")
-}
-```
+# response <- readline(prompt = "Do you want to play again? (yes/no): ")
+# return(tolower(response) == "yes")
+#
+#``
 
 
 
@@ -86,7 +74,6 @@ play_again <- function() {
 ## `simulate_craps_game`
 ```{r}
 simulate_craps_game <- function() {
-  # Initialize an empty data frame to store each roll's information
   game_data <- data.frame(
     Roll_Number = integer(),
     Die_1 = integer(),
@@ -99,7 +86,7 @@ simulate_craps_game <- function() {
     Seven_Count = integer(),
     Win_Loss_Indicator = integer()
   )
-
+  
   point_value <- NA
   point_hit_count <- 0
   seven_count <- 0
@@ -111,9 +98,7 @@ simulate_craps_game <- function() {
   die1 <- roll$Die_1
   die2 <- roll$Die_2
   total_roll <- roll$Total
-  roll_type <- "Come-Out Roll"
 
-  # Determine outcome of come-out roll
   if (total_roll == 7 || total_roll == 11) {
     outcome <- "Win"
     win_loss_indicator <- 1
@@ -123,7 +108,6 @@ simulate_craps_game <- function() {
   } else {
     point_value <- total_roll
     outcome <- "Continue to Point"
-    roll_type <- "Point Phase"
   }
 
   game_data <- rbind(game_data, data.frame(
@@ -139,14 +123,12 @@ simulate_craps_game <- function() {
     Win_Loss_Indicator = win_loss_indicator
   ))
 
-  # Enter the point phase if necessary
   roll_number <- roll_number + 1
   while (outcome == "Continue to Point") {
     roll <- roll_dice()
     die1 <- roll$Die_1
     die2 <- roll$Die_2
     total_roll <- roll$Total
-    roll_type <- "Point Phase"
     
     if (total_roll == point_value) {
       outcome <- "Win"
@@ -165,7 +147,7 @@ simulate_craps_game <- function() {
       Die_1 = die1,
       Die_2 = die2,
       Total_Roll = total_roll,
-      Roll_Type = roll_type,
+      Roll_Type = "Point Phase",
       Point_Value = point_value,
       Outcome = outcome,
       Point_Hit_Count = point_hit_count,
@@ -177,7 +159,6 @@ simulate_craps_game <- function() {
 
   return(game_data)
 }
-
 ```
 
 ```{r}
@@ -194,7 +175,7 @@ summarize_craps_game <- function(game_data) {
   losses <- if (game_outcome == "Loss") 1 else 0
 
   game_summary <- data.frame(
-    Game_ID = 1,  # Increment this based on game index in run_craps_simulation
+    Game_ID = 1,
     Total_Rolls = total_rolls,
     Point_Established = point_established,
     Game_Outcome = game_outcome,
@@ -204,7 +185,6 @@ summarize_craps_game <- function(game_data) {
   
   return(game_summary)
 }
-
 ```
 
 ```{r}
@@ -222,13 +202,12 @@ run_craps_simulation <- function(N) {
   for (i in 1:N) {
     game_data <- simulate_craps_game()
     game_summary <- summarize_craps_game(game_data)
-    game_summary$Game_ID <- i  # Assign a unique game ID
+    game_summary$Game_ID <- i
     
     all_games_data[[i]] <- game_data
     all_games_summary[[i]] <- game_summary
   }
   
-  # Combine summaries and detailed data
   all_games_summary <- do.call(rbind, all_games_summary)
   all_games_data <- do.call(rbind, lapply(seq_along(all_games_data), function(i) {
     all_games_data[[i]]$Game_ID <- i
@@ -237,15 +216,13 @@ run_craps_simulation <- function(N) {
   
   return(list(Summary = all_games_summary, Detailed = all_games_data))
 }
-
-
 ```
 
 ```{r}
 # Run simulation and get results
-result <- run_craps_simulation(N = 5)
-result$Summary  # Summary data for each game
-result$Detailed # Detailed roll-by-roll data for all games
+result <- run_craps_simulation(N = 10)
+result$Summary
+result$Detailed
 
 ```
 
