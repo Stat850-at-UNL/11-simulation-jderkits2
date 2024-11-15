@@ -14,7 +14,7 @@ Make sure this document compiles before you submit your answers.
 
 # Helper Functions
 
-## `roll_dice`
+##`roll_dice`
 
 ```{r}
 roll_dice <- function() {
@@ -25,21 +25,21 @@ roll_dice <- function() {
 ```
 
 
-## 'is_come_out_win'
+##'is_come_out_win'
 ```{r}
 is_come_out_win <- function(roll) {
   return(roll == 7 || roll == 11)
 }
 ```
 
-## 'is_come_out_loss'
+##'is_come_out_loss'
 ```{r}
 is_come_out_loss <- function(roll) {
   return(roll == 2 || roll == 3 || roll == 12)
 }
 ```
 
-## 'play_point_phase'
+##'play_point_phase'
 ```{r}
 play_point_phase <- function(point) {
   n_rolls <- 0
@@ -55,23 +55,21 @@ play_point_phase <- function(point) {
 }
 ```
 
-## 'play_again'
-#``{r}
-#lay_again <- function() {
-  # Input: None
-  # Output: TRUE if the player wants to play again, FALSE otherwise
-  # Description: Asks the player if they want to continue playing
-# response <- readline(prompt = "Do you want to play again? (yes/no): ")
+# 'play_again' (commenting out until simulation)
+#```{r}
+#play_again <- function() {
+
+#response <- readline(prompt = "Do you want to play again? (yes/no): ")
 # return(tolower(response) == "yes")
-#
-#``
+#}
+#```
 
 
 
 
 # Main Functions
 
-## `simulate_craps_game`
+##`simulate_craps_game`
 ```{r}
 simulate_craps_game <- function() {
   game_data <- data.frame(
