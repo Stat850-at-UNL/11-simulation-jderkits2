@@ -1,0 +1,186 @@
+---
+title: "Craps Simulation Analysis"
+format: html
+editor: visual
+---
+
+\#**Objective**:
+
+What is the probability of winning a game of craps, if the point is established?
+
+---
+
+##simulate a single game of craps
+
+```{r, message = FALSE}
+# Load necessary libraries
+library(tidyverse)
+
+# Define function to simulate a single game
+simulate_craps_game <- function() {
+  game_data <- data.frame(
+    Roll_Number = integer(),
+    Roll = integer(),
+    Outcome = character(),
+    stringsAsFactors = FALSE
+  )
+
+  # First roll (Come-Out Roll)
+  roll <- sample(1:6, 1) + sample(1:6, 1)
+  Roll_Number <- 1
+  if (roll == 7 || roll == 11) {
+    Outcome <- "Win"
+  } else if (roll == 2 || roll == 3 || roll == 12) {
+    Outcome <- "Loss"
+  } else {
+    Outcome <- "Continue"
+    point <- roll
+  }
+  game_data <- rbind(game_data, data.frame(Roll_Number, Roll = roll, Outcome))
+
+  # If "Continue," enter Point Phase
+  if (Outcome == "Continue") {
+    repeat {
+      Roll_Number <- Roll_Number + 1
+      roll <- sample(1:6, 1) + sample(1:6, 1)
+      if (roll == point) {
+        Outcome <- "Win"
+        game_data <- rbind(game_data, data.frame(Roll_Number, Roll = roll, Outcome))
+        break
+      } else if (roll == 7) {
+        Outcome <- "Loss"
+        game_data <- rbind(game_data, data.frame(Roll_Number, Roll = roll, Outcome))
+        break
+      } else {
+        Outcome <- "Continue"
+        game_data <- rbind(game_data, data.frame(Roll_Number, Roll = roll, Outcome))
+      }
+    }
+  }
+  return(game_data)
+}
+
+```
+
+##Check a single game simulation:
+
+```{r}
+# Check one game's data
+set.seed(123)  # For reproducibility
+game_data <- simulate_craps_game()
+print(game_data)
+
+```
+
+##Simulate Multiple Games:
+
+```{r}
+# Define a function to simulate multiple games
+run_craps_simulation <- function(N) {
+  all_games <- data.frame()
+  for (i in 1:N) {
+    game_data <- simulate_craps_game()
+    game_summary <- data.frame(
+      Game_ID = i,
+      Total_Rolls = nrow(game_data),
+      Point_Established = any(game_data$Outcome == "Continue"),
+      Game_Outcome = tail(game_data$Outcome, 1),
+      Wins = ifelse(tail(game_data$Outcome, 1) == "Win", 1, 0),
+      Losses = ifelse(tail(game_data$Outcome, 1) == "Loss", 1, 0)
+    )
+    all_games <- rbind(all_games, game_summary)
+  }
+  return(all_games)
+}
+
+# Simulate 5 games to preview
+set.seed(123)
+simulated_games <- run_craps_simulation(5)
+print(simulated_games)
+
+```
+
+##Results of the simulation
+
+```{r}
+# Summarize simulation results
+summary_results <- simulated_games %>%
+  count(Game_Outcome) %>%
+  mutate(Probability = n / sum(n))
+print(summary_results)
+
+# Visualize simulation results
+ggplot(summary_results, aes(x = Game_Outcome, y = Probability, fill = Game_Outcome)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Game Outcomes in Craps Simulation",
+    x = "Outcome",
+    y = "Probability"
+  ) +
+  theme_minimal()
+
+
+```
+
+##Simulation Variability
+
+```{r}
+# Function to analyze variability
+simulate_and_summarize <- function(N) {
+  results <- run_craps_simulation(N)
+  summary <- results %>%
+    count(Game_Outcome) %>%
+    mutate(Probability = n / sum(n), games = N)
+  return(summary)
+}
+# Compare probabilities with varying sample sizes including 2500
+variability_results <- bind_rows(
+  simulate_and_summarize(100),
+  simulate_and_summarize(500),
+  simulate_and_summarize(1000),
+  simulate_and_summarize(2500)  # Add 2500 to the simulation
+)
+
+# Plot variability for games up to 2500
+ggplot(variability_results %>% filter(games <= 2500), 
+       aes(x = games, y = Probability, color = Game_Outcome, group = Game_Outcome)) +
+  geom_line() +
+  labs(
+    title = "Simulation Variability for Games Between 0 and 2500",
+    x = "Number of Games",
+    y = "Probability"
+  ) +
+  theme_minimal()
+
+
+# Print variability results
+print(variability_results)
+
+```
+
+#Based on the variability estimates the best estimate is 1000+ games...this offers the best results for computational time and accuracy....more games give more reliable results and at a casino-over 10,000 games would give a reliable advantage to the house.
+
+#To answer our probability question:
+
+```{r}
+# Calculate conditional probability of winning when the point was established
+conditional_results <- simulated_games %>%
+  filter(Point_Established == TRUE) %>%
+  count(Game_Outcome) %>%
+  mutate(Probability = n / sum(n))
+
+# Print conditional probabilities
+print(conditional_results)
+
+# Visualize conditional probabilities
+ggplot(conditional_results, aes(x = Game_Outcome, y = Probability, fill = Game_Outcome)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("Loss" = "orange", "Win" = "blue"))+
+  labs(
+    title = "Conditional Probability of Winning or Losing (Point Established)",
+    x = "Outcome",
+    y = "Probability"
+  ) +
+  theme_minimal()
+
+```
