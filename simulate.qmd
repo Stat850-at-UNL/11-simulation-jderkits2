@@ -4,8 +4,6 @@ format: html
 editor: visual
 ---
 
-\![Craps\](crapsim.jpg)
-
 #Objectives
 
 To simulate a craps game, multiple craps games, and determine wining/losing variability.
