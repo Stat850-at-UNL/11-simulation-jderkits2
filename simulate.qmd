@@ -4,9 +4,13 @@ format: html
 editor: visual
 ---
 
-\#**Objective**:
+\![Craps\](crapsim.jpg)
 
-What is the probability of winning a game of craps, if the point is established?
+#Objectives
+
+To simulate a craps game, multiple craps games, and determine wining/losing variability.
+
+To answer the question- What is the probability of winning a game of craps, if the point is established?
 
 ---
 
